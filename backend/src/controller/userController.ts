@@ -35,9 +35,20 @@ export const createUser = async (req: Request, res: Response) => {
      })
 
 
-    res.status(200).json({
-      message: "user is created..",
-    });
+    const token = jwt.sign(
+      {
+        userId,
+      },
+      ENV.JWT_SECRETE as string
+    );
+
+    res
+      .status(200)
+      .cookie("token", token)
+      .json({
+        message: "user is created..",
+        token,
+      });
   } catch (e) {
     res.json({
       message: "user is not created ...",
@@ -80,18 +91,18 @@ export const signinUser = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        email,
+        userId: existingUser._id,
       },
       ENV.JWT_SECRETE as string
     );
 
     return res
       .status(200)
+      .cookie("token", token)
       .json({
         message: "User is signin",
         token: token,
-      })
-      .cookie("token", token);
+      });
   } catch (error) {
     res.json({
       message: "Internal server error",

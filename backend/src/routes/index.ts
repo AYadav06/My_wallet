@@ -6,8 +6,10 @@ import { getBalance, transferBalance } from "../controller/accountController";
 
 export const userRouter=Router();
 export const accountRouter=Router();
-userRouter.post("/api/v1/auth/signup",createUser);
-userRouter.post("/api/v1/auth/signin",signinUser);
-userRouter.put("/api/v1/auth/update",authMiddleware,updateUser);
-accountRouter.get("/api/v1/account/balance",authMiddleware,getBalance);
-accountRouter.post("api/v1/account/transfer",authMiddleware,transferBalance);
+
+userRouter.post("/signup",createUser);
+userRouter.post("/signin",signinUser);
+userRouter.put("/update",authMiddleware,updateUser);
+
+accountRouter.get("/balance",authMiddleware,getBalance);
+accountRouter.post("/transfer",authMiddleware,transferBalance);
