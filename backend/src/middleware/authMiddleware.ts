@@ -1,26 +1,20 @@
 import { NextFunction, Request,Response } from "express";
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken"
 import { ENV } from "../config/env";
-import { user } from "../model/user";
-
-
 
 export const authMiddleware=async (req:Request,res:Response,next:NextFunction)=>{
-
-
+    const token=req.cookies.token;
+    if(!token){
+        res.status(401).json({
+            message:"Unauthorized user"
+        })
+        return;
+    };
     try {
-        
-  const token=req.cookies.token;
-
-  if(!token){
-    return res.status(401).json({
-        message:"Unauthorized user"
-    })
-  };
-
-  const decoded=jwt.verify(token,ENV.JWT_SECRETE);
+  const data=jwt.verify(token,ENV.JWT_SECRETE!);
+  req.userId=(data as unknown as JwtPayload).userId as unknown as string;
   next();
     } catch (error) {
-        return res.status(401).json({ message: "Unauthorized user" });
+        res.status(401).json({ message: "Unauthorized user" });
     }
 }
