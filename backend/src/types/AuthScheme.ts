@@ -1,4 +1,4 @@
-import z, { email } from 'zod';
+import z from 'zod';
 
 export const AuthSchema=z.object({
     firstName:z.string(),
@@ -7,7 +7,7 @@ export const AuthSchema=z.object({
     password:z.string()
 });
 
-export const signSchema=z.object({
-    email:z.email(),
+export const signinSchema=z.object({
+    email:z.string().email(),
     password:z.string()
 })
