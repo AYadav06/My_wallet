@@ -86,9 +86,7 @@ export const signinUser = async (req: Request, res: Response) => {
 };
 
 
-
-
 export const updateUser=async ()=>{
 
-    
+
 }
