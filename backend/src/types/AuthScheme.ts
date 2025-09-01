@@ -11,3 +11,9 @@ export const signinSchema=z.object({
     email:z.string().email(),
     password:z.string()
 })
+
+export const updateUserSchema=z.object({
+    password:z.string().optional(),
+    firstName:z.string().optional(),
+    lastName:z.string().optional()
+});

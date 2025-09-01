@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { AuthSchema, signinSchema } from "../types/AuthScheme";
+import {
+  AuthSchema,
+  signinSchema,
+  updateUserSchema,
+} from "../types/AuthScheme";
 import { user } from "../model/user";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/env";
@@ -85,8 +89,34 @@ export const signinUser = async (req: Request, res: Response) => {
   }
 };
 
+export const updateUser = async (req: Request, res: Response) => {
+  const parsedData = updateUserSchema.safeParse(req.body);
+  if (!parsedData.success) {
+    res.status(411).send("error while updating user ");
+    return;
+  }
 
-export const updateUser=async ()=>{
+  try {
+    const { firstName, lastName, password } = parsedData.data;
+    const updateData: any = {};
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
+    if (password)
+      updateData.password = await bcrypt.hash(parsedData.data.password!, 10);
 
+    await user.updateOne(
+      {
+        _id: req.userId,
+      },
+      { $set: updateData }
+    );
 
-}
+    res.json({
+      message: "user is updated",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
