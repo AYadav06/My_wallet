@@ -4,7 +4,7 @@ import {
   signinSchema,
   updateUserSchema,
 } from "../types/AuthScheme";
-import { user } from "../model/user";
+import { Account, User } from "../model/db";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/env";
 import bcrypt from "bcrypt";
@@ -22,12 +22,19 @@ export const createUser = async (req: Request, res: Response) => {
     const { firstName, lastName, email, password } = result.data;
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await user.create({
+    const user=await User.create({
       firstName: firstName,
       lastName: lastName,
       email: email,
       password: hashedPassword,
     });
+     const userId=user._id;
+     await Account.create({
+        userId,
+        balance:1+Math.random()*10000
+     })
+
+
     res.status(200).json({
       message: "user is created..",
     });
@@ -37,6 +44,10 @@ export const createUser = async (req: Request, res: Response) => {
       error: e,
     });
   }
+
+
+
+
 };
 
 export const signinUser = async (req: Request, res: Response) => {
@@ -50,7 +61,7 @@ export const signinUser = async (req: Request, res: Response) => {
   }
   const { email, password } = result.data;
   try {
-    const existingUser = await user.findOne({
+    const existingUser = await User.findOne({
       email,
     });
 
@@ -104,7 +115,7 @@ export const updateUser = async (req: Request, res: Response) => {
     if (password)
       updateData.password = await bcrypt.hash(parsedData.data.password!, 10);
 
-    await user.updateOne(
+    await User.updateOne(
       {
         _id: req.userId,
       },
