@@ -36,7 +36,6 @@ export default function Dashboard() {
         </div>
 
         <div className="p-6">
-          {/* Balance Section */}
           <div className="mb-8">
             <div className="flex items-baseline gap-3">
               <h2 className="text-xl font-bold text-gray-900">Your Balance</h2>
