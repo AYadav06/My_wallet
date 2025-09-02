@@ -3,7 +3,9 @@ import { userRouter, accountRouter } from './routes';
 import { ConnectDb } from './config/db';
 import cookieParser from 'cookie-parser';
 const app=express();
+import cors from "cors";
 
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/v1/auth",userRouter);

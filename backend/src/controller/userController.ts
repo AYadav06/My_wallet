@@ -10,7 +10,6 @@ import { ENV } from "../config/env";
 import bcrypt from "bcrypt";
 
 export const createUser = async (req: Request, res: Response) => {
-  console.log("user is in createUser controller");
   try {
     const result = AuthSchema.safeParse(req.body);
     if (!result.success) {
