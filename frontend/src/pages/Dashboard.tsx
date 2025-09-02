@@ -80,7 +80,7 @@ export default function Dashboard() {
                     </span>
                   </div>
                   <button
-                    onClick={() =>navigate('/sendMoney')}
+                    onClick={() =>navigate('/send')}
                     className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
                   >
                     Send Money

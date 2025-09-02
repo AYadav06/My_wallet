@@ -4,6 +4,7 @@ import './App.css'
 import Signin from './components/Signin'
 import Signup from './components/Signup'
 import Dashboard from './pages/Dashboard'
+import { SendMoney } from './components/SendMoney'
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Route path='/signup' element={<Signup />} />
       <Route path='/signin' element={<Signin />} />
       <Route path='/signin' element={<Dashboard />} />
+      <Route path="/send" element={<SendMoney />} />
     </Routes>
     </BrowserRouter>
     </>
