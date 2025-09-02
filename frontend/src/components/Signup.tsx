@@ -1,6 +1,9 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
+    const navigate=useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -12,9 +15,25 @@ const Signup: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signup data:", formData);
+   await axios({
+    method:"POST",
+    url:"http://localhost:3000/api/v1/auth/signup",
+    data:{
+        "firstName":formData.firstName,
+        "lastName":formData.lastName,
+        "email":formData.email,
+        "password":formData.password
+    }
+   })
+   setFormData({
+    firstName:"",
+    lastName:"",
+    email:"",
+    password:""
+   })
+ navigate("/signin");
   };
 
   return (

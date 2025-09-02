@@ -1,6 +1,9 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signin: React.FC = () => {
+    const navigate=useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -10,9 +13,23 @@ const Signin: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signin data:", formData);
+
+    await axios({
+   method:"POST",
+   url:"http://localhost:3000/api/v1/auth/signin",
+   data:{
+    "email":formData.email,
+    "password":formData.password
+   }
+    })
+    setFormData({
+        "email":"",
+        "password":""
+    })
+    navigate("/dashboard");
+
   };
 
   return (

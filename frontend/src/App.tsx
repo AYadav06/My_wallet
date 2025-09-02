@@ -6,7 +6,6 @@ import Signup from './components/Signup'
 import Dashboard from './pages/Dashboard'
 import { SendMoney } from './components/SendMoney'
 
-
 function App() {
   return (
     <>
@@ -14,7 +13,7 @@ function App() {
     <Routes>
       <Route path='/signup' element={<Signup />} />
       <Route path='/signin' element={<Signin />} />
-      <Route path='/signin' element={<Dashboard />} />
+      <Route path='/dashboard' element={<Dashboard />} />
       <Route path="/send" element={<SendMoney />} />
     </Routes>
     </BrowserRouter>
