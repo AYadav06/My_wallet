@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface User {
   id: string;
@@ -8,19 +9,40 @@ interface User {
 }
 
 export default function Dashboard() {
-  const [balance] = useState(5000);
+  const [balance,setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate=useNavigate();
-  const [users] = useState<User[]>([
-    { id: 'U1', name: 'User 1' },
-    { id: 'U2', name: 'User 2' },
-    { id: 'U3', name: 'User 3' },
-  ]);
+  const [user, setUser] = useState<{firstName: string, lastName: string} | null>(null);
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
+
+  useEffect(()=>{
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [balanceRes, userRes] = await Promise.all([
+          axios.get("http://localhost:3000/api/v1/account/balance", {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }),
+          axios.get("http://localhost:3000/api/v1/auth/me", {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }),
+        ]);
+        setBalance(balanceRes.data.balance);
+        setUser(userRes.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  },[])
   return (
     <div className="min-h-screen bg-white p-4">
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200">
@@ -28,9 +50,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900">Payments App</h1>
           <div className="flex items-center gap-3">
-            <span className="text-gray-600">Hello, User</span>
+            <span className="text-gray-600">Hello, {user?.firstName}</span>
             <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-gray-700">U</span>
+              <span className="text-sm font-medium text-gray-700">{user?.firstName?.[0]}</span>
             </div>
           </div>
         </div>
@@ -39,13 +61,16 @@ export default function Dashboard() {
           <div className="mb-8">
             <div className="flex items-baseline gap-3">
               <h2 className="text-xl font-bold text-gray-900">Your Balance</h2>
-              <span className="text-2xl font-bold text-green-600">
-                ${balance.toLocaleString()}
-              </span>
+              {
+                loading ? <span className="text-2xl font-bold text-gray-600">Loading...</span> :
+                error ? <span className="text-2xl font-bold text-red-600">Error</span> :
+                <span className="text-2xl font-bold text-green-600">
+                  ${balance.toLocaleString()}
+                </span>
+              }
             </div>
           </div>
 
-          {/* Users Section */}
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-6">Users</h2>
             
@@ -63,36 +88,7 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Users List */}
-            <div className="space-y-4">
-              {filteredUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between py-4 px-0"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-600 font-medium min-w-[2rem]">
-                      {user.id}
-                    </span>
-                    <span className="text-gray-900 font-medium">
-                      {user.name}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() =>navigate('/send')}
-                    className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200"
-                  >
-                    Send Money
-                  </button>
-                </div>
-              ))}
-              
-              {filteredUsers.length === 0 && searchTerm && (
-                <div className="text-center py-8 text-gray-500">
-                  No users found matching "{searchTerm}"
-                </div>
-              )}
-            </div>
+            
           </div>
         </div>
       </div>

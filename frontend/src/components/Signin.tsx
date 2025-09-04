@@ -15,21 +15,21 @@ const Signin: React.FC = () => {
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-
-    await axios({
-   method:"POST",
-   url:"http://localhost:3000/api/v1/auth/signin",
-   data:{
-    "email":formData.email,
-    "password":formData.password
-   }
-    })
-    setFormData({
-        "email":"",
-        "password":""
-    })
-    navigate("/dashboard");
-
+    try {
+      const res=await axios({
+        method:"POST",
+        url:"http://localhost:3000/api/v1/auth/signin",
+        data:{
+          "email":formData.email,
+          "password":formData.password
+        },
+        withCredentials:true
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error signing in:", error);
+      alert("Invalid email or password");
+    }
   };
 
   return (
