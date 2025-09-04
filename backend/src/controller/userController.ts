@@ -13,7 +13,7 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const result = AuthSchema.safeParse(req.body);
     if (!result.success) {
-      return res.json({
+      return res.status(400).json({
         message: "Invalid Input",
         error: result.error,
       });
@@ -41,9 +41,7 @@ export const createUser = async (req: Request, res: Response) => {
       ENV.JWT_SECRETE as string
     );
 
-    res
-      .status(200)
-      .cookie("token", token)
+    res.status(200)
       .json({
         message: "user is created..",
         token,
@@ -97,7 +95,11 @@ export const signinUser = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .cookie("token", token)
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure:false
+      })
       .json({
         message: "User is signin",
         token: token,
@@ -107,6 +109,21 @@ export const signinUser = async (req: Request, res: Response) => {
       message: "Internal server error",
       error: error,
     });
+  }
+};
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

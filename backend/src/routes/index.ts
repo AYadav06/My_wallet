@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, signinUser, updateUser } from "../controller/userController";
+import { createUser, signinUser, updateUser, getUser } from "../controller/userController";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { getBalance, transferBalance } from "../controller/accountController";
 
@@ -10,6 +10,7 @@ export const accountRouter=Router();
 userRouter.post("/signup",createUser);
 userRouter.post("/signin",signinUser);
 userRouter.put("/update",authMiddleware,updateUser);
+userRouter.get("/me",authMiddleware,getUser);
 
 accountRouter.get("/balance",authMiddleware,getBalance);
 accountRouter.post("/transfer",authMiddleware,transferBalance);

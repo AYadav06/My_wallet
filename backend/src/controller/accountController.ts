@@ -4,6 +4,7 @@ import mongoose, { mongo } from "mongoose";
 
 
 export const getBalance=async(req:Request,res:Response)=>{
+    console.log("UserId in getBalance:", req.userId);
     try {
         const account=await Account.findOne({
             userId:req.userId
@@ -23,6 +24,7 @@ export const getBalance=async(req:Request,res:Response)=>{
 
 export const transferBalance=async(req:Request,res:Response)=>{
 const session=await mongoose.startSession();
+session.startTransaction();
 const {amount,to}=req.body;
 
 const account=await Account.findOne({
@@ -50,12 +52,19 @@ if(!toAccount){
     })
 }
 
-await Account.updateOne({userId:req.userId},{$inc:{balance:-amount}}).session(session);
-await Account.updateOne({userId:to},{$inc:{balance:amount}}).session(session);
-
-await session.commitTransaction();
-res.json({
-    message:"Transfer Successfull"
+try{
+    await Account.updateOne({userId:req.userId},{$inc:{balance:-amount}}).session(session);
+    await Account.updateOne({userId:to},{$inc:{balance:amount}}).session(session);
+    
+    await session.commitTransaction();
+    res.json({
+        message:"Transfer Successfull"
+    })
+}catch(e){
+await session.abortTransaction();
+res.status(500).json({
+    message:"Internal Server Error"
 })
+}
 }
 
