@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/client";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,23 +17,24 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-   await axios({
-    method:"POST",
-    url:"http://localhost:3000/api/v1/auth/signup",
-    data:{
-        "firstName":formData.firstName,
-        "lastName":formData.lastName,
-        "email":formData.email,
-        "password":formData.password
+    try {
+      await api.post("/auth/signup", {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password
+      });
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: ""
+      });
+      navigate("/signin");
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+      alert(error?.response?.data?.message || "Signup failed");
     }
-   })
-   setFormData({
-    firstName:"",
-    lastName:"",
-    email:"",
-    password:""
-   })
- navigate("/signin");
   };
 
   return (

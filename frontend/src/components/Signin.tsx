@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../api/client";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,19 +16,14 @@ const Signin: React.FC = () => {
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res=await axios({
-        method:"POST",
-        url:"http://localhost:3000/api/v1/auth/signin",
-        data:{
-          "email":formData.email,
-          "password":formData.password
-        },
-        withCredentials:true
+      const res=await api.post("/auth/signin", {
+          email:formData.email,
+          password:formData.password
       });
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error signing in:", error);
-      alert("Invalid email or password");
+      alert(error?.response?.data?.message || "Signin failed");
     }
   };
 
