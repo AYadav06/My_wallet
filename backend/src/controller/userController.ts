@@ -41,7 +41,16 @@ export const createUser = async (req: Request, res: Response) => {
       ENV.JWT_SECRETE as string
     );
 
-    res.status(200)
+    // Use env-driven cookie options
+    const cookieOptions = {
+      httpOnly: true as const,
+      sameSite: "lax" as const,
+      secure: process.env.NODE_ENV === "production",
+    };
+
+    res
+      .status(200)
+      .cookie("token", token, cookieOptions)
       .json({
         message: "user is created..",
         token,
@@ -52,9 +61,6 @@ export const createUser = async (req: Request, res: Response) => {
       error: e,
     });
   }
-
-
-
 
 };
 
@@ -67,14 +73,14 @@ export const signinUser = async (req: Request, res: Response) => {
       error: result.error,
     });
   }
-  const { email, password } = result.data;
+  const { email } = result.data;
   try {
     const existingUser = await User.findOne({
       email,
     });
 
     if (!existingUser) {
-      return res.json({
+      return res.status(400).json({
         message: "user is not exist",
       });
     }
@@ -83,7 +89,7 @@ export const signinUser = async (req: Request, res: Response) => {
       existingUser.password!
     );
     if (!validPassword) {
-      return res.json({ message: "password is incorrect" });
+      return res.status(400).json({ message: "password is incorrect" });
     }
 
     const token = jwt.sign(
@@ -93,19 +99,19 @@ export const signinUser = async (req: Request, res: Response) => {
       ENV.JWT_SECRETE as string
     );
 
-    return res
-      .status(200)
-      .cookie("token", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure:false
-      })
+    const cookieOptions = {
+      httpOnly: true as const,
+      sameSite: "lax" as const,
+      secure: process.env.NODE_ENV === "production",
+    };
+
+    res.cookie("token", token, cookieOptions)
       .json({
         message: "User is signin",
         token: token,
       });
   } catch (error) {
-    res.json({
+    res.status(200).json({
       message: "Internal server error",
       error: error,
     });
@@ -122,6 +128,19 @@ export const getUser = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
     });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find({ _id: { $ne: req.userId } });
+    res.json(users.map(user => ({
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    })));
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -157,4 +176,13 @@ export const updateUser = async (req: Request, res: Response) => {
       message: "Internal server error",
     });
   }
+};
+
+export const logoutUser = (req: Request, res: Response) => {
+  const cookieOptions = {
+    httpOnly: true as const,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+  };
+  res.clearCookie("token", cookieOptions).json({ message: "Logged out successfully" });
 };

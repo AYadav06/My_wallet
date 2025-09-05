@@ -4,7 +4,7 @@ import mongoose, { mongo } from "mongoose";
 
 
 export const getBalance=async(req:Request,res:Response)=>{
-    console.log("UserId in getBalance:", req.userId);
+    
     try {
         const account=await Account.findOne({
             userId:req.userId
